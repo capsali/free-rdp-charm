@@ -305,21 +305,6 @@ function Get-IPInRange {
         $Range
     )
 
-function Get-IPFromSubnet {
-    Param(
-        [Parameter(Mandatory=$true)]
-        [string]$Subnet
-    )
-    $localIPAddresses = Get-NetIPAddress -AddressFamily IPv4
-    foreach ($localIPAddress in $localIPAddresses) {
-        $ipInSubnet = Get-IPInRange -IPAddress $localIPAddress.IPAddress -Range $Subnet
-        if ($ipInSubnet) {
-            return $localIPAddress.IPAddress
-        }
-    }
-    return
-}
-
     # Split range into the address and the CIDR notation
     [String]$CIDRAddress = $Range.Split('/')[0]
     [int]$CIDRBits       = $Range.Split('/')[1]
@@ -335,6 +320,26 @@ function Get-IPFromSubnet {
     } else {
         $false
     }
+}
+
+function Get-IPFromSubnet {
+    Param(
+        [Parameter(Mandatory=$false)]
+        [string]$Subnet
+    )
+    if (! $Subnet) {
+		Write-JujuWarning "No subnet specified for proxy address. Using juju provided local IP"
+		return
+	}
+    $localIPAddresses = Get-NetIPAddress -AddressFamily IPv4
+    foreach ($localIPAddress in $localIPAddresses) {
+        $ipInSubnet = Get-IPInRange -IPAddress $localIPAddress.IPAddress -Range $Subnet
+        if ($ipInSubnet) {
+            return $localIPAddress.IPAddress
+        }
+    }
+    Write-JujuWarning "No matching IP address found. Using JUJU provided local IP"
+    return
 }
 
 # HOOK FUNCTIONS
