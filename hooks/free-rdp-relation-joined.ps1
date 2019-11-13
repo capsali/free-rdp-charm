@@ -21,8 +21,13 @@ Import-Module JujuLogging
 try {
     Import-Module JujuHooks
     Import-Module JujuUtils
+    Import-Module FreeRdpHooks
 
-    $ipAddress = Get-JujuUnitPrivateIP
+    $rdpProxySubnet = Get-JujuCharmConfig -Scope "rdp-proxy-subnet"
+    $ipAddress = Get-IPFromSubnet -Subnet "$rdpProxySubnet"
+    if (! $ipAddress) {
+        $ipAddress = Get-JujuUnitPrivateIP
+    }
     $port = Get-JujuCharmConfig -Scope "http-port"
     $url = "http://{0}:{1}" -f @($ipAddress, $port)
 

@@ -14,6 +14,12 @@ options:
       If you use this option, you may enable file integrity checking
       by specifying an md5sum at the end of the URL as follows:
         https://example.com/installer.msi#md5=<hash>
+  rdp-proxy-subnet:
+    type: string
+    description: |
+      Sepcify the subnet that it used to display the rdp console on the dashboard.
+      The node that this charm is running on should have an IP from the 
+      specified subnet.
   tenant-username:
     type: string
     default: "freerdp"
